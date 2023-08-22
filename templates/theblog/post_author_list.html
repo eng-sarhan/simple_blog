@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if author_posts %}
+
+	<h1>{{ post.author.username }}</h1>
+
+	<ul>
+	{% for post in author_posts %}
+		<li><a href="{% url 'theblog:article-detail' post.pk %}">{{ post.title }}</a>
+			- {{ post.author.username }} -
+			{{ post.post_date }} <small>
+
+			{% if user.is_authenticated and user.id == post.author.id %}
+				- <a href="{% url 'theblog:update_post' post.pk %}">(Edit)</a>
+
+				<a href="{% url 'theblog:delete_post' post.pk %}">(Delete)</a>
+			{% endif %}
+
+		</small> <br/>
+		{{ post.body|slice:":200"|safe }}</li>
+	{% endfor %}
+	</ul>
+{% endif %}
+
+{% endblock %}

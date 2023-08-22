@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+
+<!--user.id:{{user.id}}-->
+<!--<hr>-->
+<!--user.username:{{user.username}}-->
+<!--<hr>-->
+<!--post.author.id:{{post.author.id}}-->
+<!--<hr>-->
+<!--post.author:{{post.author}}-->
+<!--<hr>-->
+<!--post.author.user.username:{{ post.author.user.username }}-->
+
+    <div class="container">
+      <div class="row">
+        <!-- Latest Posts -->
+        <main class="post blog-post col-lg-8">
+          <div class="container">
+            <div class="post-single">
+              <div class="post-header d-flex align-items-center flex-column flex-sm-row"><a href="#" class="author d-flex align-items-center flex-wrap">
+                    <img src="{{ post.author.profile_picture.url }}" alt="Avatar" class="avatar">
+                  &nbsp;
+                    <a class="mr-2" href="{% url 'theblog:user-posts' post.author.username %}">{{ post.author }}</a>
+
+                    <div class="date"><i class="icon-clock"></i> {{ post.post_date }}</div>
+                &nbsp; &nbsp;
+              {% if user.is_authenticated and user.id == post.author.id %}
+                  <div>
+                    <a href="{% url 'theblog:update_post' pk=post.pk %}">Update</a>
+                    <a href="{% url 'theblog:delete_post' pk=post.pk %}">Delete</a>
+                  </div>
+                  {% endif %}
+            </div>
+
+              <div class="post-thumbnail"><img src="{{ post.header_image.url }}" alt="..." class="img-fluid"></div>
+              <div class="post-details">
+                <div class="post-meta d-flex justify-content-xl-start">
+
+                  <div class="category">
+                    {% for cat in post.categories.all %}
+                    <a href="#">{{ cat }}</a>
+                    {% endfor %}
+                  </div>
+                </div>
+                <h3>{{ post.title }}<a href="#"><i class="fa fa-bookmark-o"></i></a></h3>
+                <div class="post-body">
+                  {{ post.body | safe }}
+                </div>
+
+                <div class="post-comments">
+                  <header>
+                    <h3 class="h6">Post Comments<span class="no-of-comments">({{ post.comments.count }})</span></h3>
+                  </header>
+                  {% for comment in post.get_comments %}
+                      <div class="raw" >
+                          {% if comment.user.author %}
+                          <img class="avatar" src="{{ comment.user.author.profile_picture.url }}" alt="avatar" >
+                          {% elif comment.user.username %}
+                         <img class="avatar" src="{{ comment.user.profile.image.url }}" alt="avatar" >
+                            {% else %}
+                          <img src="{% static 'img/user.svg' %}" alt="..." class="img-fluid rounded-circle">
+                          {% endif %}
+                        <strong>{{ comment.user.username }}</strong>&nbsp;<span class="date">{{ comment.date_added }}</span></div>
+                  </div>
+
+              <div class="comment-body">
+                      <p>{{ comment.body }}</p>
+                    </div>
+                  {% endfor %}
+                </div>
+
+                {% if request.user.is_authenticated %}
+                <div class="add-comment">
+                <div class="col-8 mb-5 mt-5"  >
+                  <header>
+                    <h3 class="h6">Leave a reply</h3>
+                  </header>
+                  <form method="POST" >
+                    {% csrf_token %}
+                        {{ form|crispy }}
+                        <button type="submit" class="btn btn-outline-info">Submit Comment</button>
+                  </form>
+                </div>
+                {% else %}
+                <a href="{% url 'users:login' %}" class="btn btn-primary">Login to comment</a>
+                {% endif %}
+              </div>
+             </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+{% endblock content %}

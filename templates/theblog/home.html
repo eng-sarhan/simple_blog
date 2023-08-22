@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    
+
+<h1>Posts</h1>
+
+<ul>
+{% for post in object_list %}
+	<li><a href="{% url 'theblog:article-detail' post.pk %}">{{ post.title }}</a>
+         {% for cat in post.categories.all %}
+         <a href="{% url 'theblog:categories' cat|slugify  %}">{{ cat }}</a>
+         {% endfor %}
+		<a href="{% url 'theblog:author' post.author.id  %}">{{ post.author }}</a>
+		{{ post.post_date }}-
+
+		<small>
+		{% if user.is_authenticated %}	
+			{% if user.id == post.author.id %}
+				- <a href="{% url 'theblog:update_post' post.pk %}">(Edit)</a>
+
+				<a href="{% url 'theblog:delete_post' post.pk %}">(Delete)</a>
+			{% endif %}
+		{% endif %}
+
+	</small> <br/>
+	</li>
+{% endfor %}
+</ul>
+
+
+
+{% endblock %}
